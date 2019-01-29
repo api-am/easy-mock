@@ -30,37 +30,41 @@ function createClient (opts) {
 
     client.once('connect', onConnect)
     client.once('error', onError)
-    client.once('connectTimeout', /* istanbul ignore next */ () => {
+    client.once('connectTimeout', /* istanbul ignore next */() => {
       onError(new Error('connect timeout'))
     })
   })
 }
 
 class LDAPUtil {
-  constructor () {
-    createClient({
+  async createClient () {
+    return createClient({
       url: ldapConf.server,
       credentials: {
         dn: ldapConf.bindDN,
         passwd: ldapConf.password
-      }
+      },
+      idleTimeout: 5000
     }).then(client => {
-      this._adminClient = client
+      return client
     })
+  }
+  async closeClient (client) {
+    client.destroy()
   }
   get enable () {
     return !!ldapConf.server
   }
-  async authenticate (username, password) {
+  async authenticate (client, username, password) {
     return new Promise((resolve, reject) => {
-      if (!this._adminClient) return reject(new Error('LDAP connection is not yet bound'))
+      if (!client) return reject(new Error('LDAP connection is not yet bound'))
 
       const opts = {
         scope: 'sub',
         filter: `(${ldapConf.filter.attributeName}=${username})`
       }
 
-      this._adminClient.search(ldapConf.filter.base, opts, (err, search) => {
+      client.search(ldapConf.filter.base, opts, (err, search) => {
         /* istanbul ignore if */
         if (err) return reject(new Error(err))
 
@@ -76,6 +80,7 @@ class LDAPUtil {
 
         search.on('end', result => {
           if (items.length === 1) {
+            console.log('create ldap client for user bind')
             createClient({
               url: ldapConf.server,
               credentials: {
@@ -87,6 +92,8 @@ class LDAPUtil {
             }).catch(() => {
               reject(new Error('用户名或密码错误'))
             })
+            console.log('destroy ldap client')
+            client.destroy()
           } else {
             reject(new Error('用户名或密码错误'))
           }
