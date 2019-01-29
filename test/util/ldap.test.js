@@ -53,7 +53,7 @@ describe('test/util/ldap.test.js', () => {
   test('connection', async () => {
     let ldapClient
     try {
-      ldapClient = ldapUtil.createClient()
+      ldapClient = await ldapUtil.createClient()
       await ldapUtil.authenticate(ldapClient, 'demo@example.com', '123456')
     } catch (error) {
       expect(error.message).toEqual('LDAP connection is not yet bound')
@@ -64,7 +64,7 @@ describe('test/util/ldap.test.js', () => {
 
   test('authenticate', (done) => {
     setTimeout(async () => {
-      let ldapClient = ldapUtil.createClient()
+      let ldapClient = await ldapUtil.createClient()
       const user = await ldapUtil.authenticate(ldapClient, 'demo@example.com', '123456')
       expect(user).toBeTruthy()
       try {
