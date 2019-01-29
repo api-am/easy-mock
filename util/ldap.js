@@ -43,8 +43,7 @@ class LDAPUtil {
       credentials: {
         dn: ldapConf.bindDN,
         passwd: ldapConf.password
-      },
-      idleTimeout: 5000
+      }
     }).then(client => {
       return client
     })
