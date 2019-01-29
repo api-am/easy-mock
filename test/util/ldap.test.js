@@ -58,7 +58,7 @@ describe('test/util/ldap.test.js', () => {
     } catch (error) {
       expect(error.message).toEqual('LDAP connection is not yet bound')
     } finally {
-      ldapUtil.closeClient()
+      ldapUtil.closeClient(ldapClient)
     }
   })
 
