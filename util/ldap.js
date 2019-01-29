@@ -87,12 +87,11 @@ class LDAPUtil {
                 passwd: password
               }
             }).then(client => {
+              // unbind connection is disconnected
               client.unbind(() => resolve(true))
             }).catch(() => {
               reject(new Error('用户名或密码错误'))
             })
-            console.log('destroy ldap client')
-            client.destroy()
           } else {
             reject(new Error('用户名或密码错误'))
           }

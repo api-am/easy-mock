@@ -65,12 +65,15 @@ describe('test/util/ldap.test.js', () => {
   test('authenticate', (done) => {
     setTimeout(async () => {
       let ldapClient = await ldapUtil.createClient()
-      const user = await ldapUtil.authenticate(ldapClient, 'demo@example.com', '123456')
-      expect(user).toBeTruthy()
       try {
+        const user = await ldapUtil.authenticate(ldapClient, 'demo@example.com', '123456')
+        ldapUtil.closeClient(ldapClient)
+        expect(user).toBeTruthy()
         await ldapUtil.authenticate(ldapClient, 'demo@example.com', '1234567')
       } catch (error) {
         expect(error.message).toEqual('用户名或密码错误')
+      } finally {
+        ldapUtil.closeClient(ldapClient)
       }
 
       try {
