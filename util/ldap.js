@@ -79,7 +79,6 @@ class LDAPUtil {
 
         search.on('end', result => {
           if (items.length === 1) {
-            console.log('create ldap client for user bind')
             createClient({
               url: ldapConf.server,
               credentials: {
